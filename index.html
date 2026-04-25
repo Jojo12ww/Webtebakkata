@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Tebak Kata Multiplayer • Real Player</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #ede9fe 100%);
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #2d1b4e;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 32px;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      box-shadow: 0 24px 48px rgba(139, 92, 246, 0.12), 0 8px 24px rgba(0,0,0,0.04);
+      padding: 28px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: all 0.3s ease;
+    }
+
+    /* ========== MENU SCREEN ========== */
+    .menu-screen {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .menu-screen.hidden {
+      display: none;
+    }
+
+    .logo-section {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.25);
+    }
+    .title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+    .subtitle {
+      color: #8b5cf6;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #7c3aed;
+      letter-spacing: 0.3px;
+    }
+    .form-input {
+      padding: 15px 18px;
+      border: 2px solid #e9d5ff;
+      border-radius: 16px;
+      font-size: 1rem;
+      outline: none;
+      background: #faf5ff;
+      color: #2d1b4e;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .form-input:focus {
+      border-color: #a855f7;
+      box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
+      background: #fff;
+    }
+    .form-input::placeholder {
+      color: #c4b5e3;
+    }
+
+    .btn {
+      padding: 16px 24px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.25s;
+      font-family: inherit;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+      color: white;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(124, 58, 237, 0.4);
+    }
+    .btn-outline {
+      background: white;
+      color: #7c3aed;
+      border: 2px solid #d8b4fe;
+    }
+    .btn-outline:hover {
+      background: #faf5ff;
+      border-color: #a855f7;
+    }
+    .btn-sm {
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #c4b5e3;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e9d5ff;
+    }
+
+    /* ========== GAME SCREEN ========== */
+    .game-screen {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .game-screen.active {
+      display: flex;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #faf5ff;
+      border-radius: 20px;
+      padding: 10px 16px;
+      border: 1px solid #e9d5ff;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .room-badge {
+      font-weight: 700;
+      color: #7c3aed;
+      background: #ede9fe;
+      padding: 8px 16px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-icon {
+      background: white;
+      border: 1px solid #e9d5ff;
+      padding: 8px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #7c3aed;
+      transition: 0.2s;
+    }
+    .btn-icon:hover {
+      background: #faf5ff;
+    }
+
+    .player-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 4px 0;
+    }
+    .player-tag {
+      background: #ede9fe;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #6d28d9;
+      border: 1px solid #d8b4fe;
+    }
+    .player-tag.you {
+      background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+      color: white;
+      border: none;
+    }
+    .player-tag.host {
+      border: 2px solid #a855f7;
+    }
+
+    .word-card {
+      background: white;
+      border: 1px solid #e9d5ff;
+      border-radius: 24px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.06);
+    }
+    .category-badge {
+      display: inline-block;
+      background: #ede9fe;
+      color: #7c3aed;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 6px 16px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .hidden-word {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: 12px;
+      color: #6d28d9;
+      margin: 8px 0;
+      font-variant-ligatures: none;
+    }
+    .hint-text {
+      color: #a78bfa;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+    .input-row input {
+      flex: 2;
+      padding: 15px 18px;
+      border: 2px solid #e9d5ff;
+      border-radius: 16px;
+      font-size: 1rem;
+      outline: none;
+      background: #faf5ff;
+      font-family: inherit;
+      font-weight: 500;
+      color: #2d1b4e;
+      transition: 0.2s;
+    }
+    .input-row input:focus {
+      border-color: #a855f7;
+      box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
+      background: #fff;
+    }
+    .input-row button {
+      background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 0 24px;
+      border-radius: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+    }
+    .input-row button:hover {
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+    }
+
+    .log-box {
+      background: #faf5ff;
+      border-radius: 20px;
+      padding: 12px 16px;
+      height: 150px;
+      overflow-y: auto;
+      border: 1px solid #e9d5ff;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .log-entry {
+      padding: 8px 14px;
+      border-radius: 14px;
+      background: white;
+      border-left: 3px solid #d8b4fe;
+      color: #4c1d95;
+    }
+    .log-entry.system {
+      background: #ede9fe;
+      border-left-color: #a855f7;
+      font-weight: 500;
+    }
+    .log-entry.correct {
+      background: #ecfdf5;
+      border-left-color: #10b981;
+      color: #065f46;
+      font-weight: 600;
+    }
+    .log-entry.wrong {
+      background: #fef2f2;
+      border-left-color: #ef4444;
+      color: #991b1b;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-action {
+      flex: 1;
+      background: white;
+      border: 1px solid #e9d5ff;
+      padding: 12px;
+      border-radius: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      color: #7c3aed;
+      transition: 0.2s;
+      font-size: 0.85rem;
+    }
+    .btn-action:hover {
+      background: #faf5ff;
+    }
+    .btn-action.primary {
+      background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+      color: white;
+      border: none;
+    }
+
+    .status-bar {
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: #ede9fe;
+      color: #6d28d9;
+    }
+    .status-bar.connected {
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #c4b5e3;
+      font-weight: 500;
+    }
+
+    @media (max-width: 400px) {
+      .hidden-word {
+        letter-spacing: 8px;
+        font-size: 2.2rem;
+      }
+      .container {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+
+  <!-- ==================== MENU UTAMA ==================== -->
+  <div class="menu-screen" id="menuScreen">
+    <div class="logo-section">
+      <div class="logo-icon">🧩</div>
+      <div class="title">Tebak Kata</div>
+      <div class="subtitle">Multiplayer • Real Player • Peer-to-Peer</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">👤 Nama Kamu</label>
+      <input class="form-input" id="namaInput" placeholder="Masukkan nama panggilan..." autocomplete="off" maxlength="20">
+    </div>
+
+    <button class="btn btn-primary" id="btnBikinRoom">🏠 Bikin Room Baru</button>
+
+    <div class="divider">atau gabung room</div>
+
+    <div class="form-group">
+      <label class="form-label">🆔 ID Room</label>
+      <input class="form-input" id="roomIdJoinInput" placeholder="Paste ID Room dari host..." autocomplete="off" style="text-align:center; letter-spacing:1px; font-weight:600;">
+    </div>
+    <button class="btn btn-outline" id="btnMasukRoom">➡️ Masuk Room</button>
+
+    <div class="footer-note">🇮🇩 10.000.000+ kata • Real-time WebRTC</div>
+  </div>
+
+  <!-- ==================== GAME SCREEN ==================== -->
+  <div class="game-screen" id="gameScreen">
+    <div class="top-bar">
+      <span class="room-badge">🏠 <span id="roomIdDisplay">------</span></span>
+      <button class="btn-icon" id="copyRoomBtn">📋 Salin ID</button>
+      <button class="btn-icon" id="btnKeluar" style="color:#ef4444; border-color:#fecaca;">🚪 Keluar</button>
+    </div>
+
+    <div class="player-list" id="playerList">
+      <span class="player-tag you">Kamu</span>
+    </div>
+
+    <div class="word-card">
+      <div class="category-badge" id="categoryDisplay">📌 KATA UMUM</div>
+      <div class="hidden-word" id="wordDisplay">_ _ _ _ _</div>
+      <div class="hint-text" id="hintDisplay">🕵️ 5 huruf</div>
+    </div>
+
+    <div class="input-row">
+      <input type="text" id="guessInput" placeholder="Ketik huruf atau kata..." autocomplete="off">
+      <button id="submitGuess">➤ Tebak</button>
+    </div>
+
+    <div class="log-box" id="logContainer">
+      <div class="log-entry system">🔌 Menghubungkan ke jaringan...</div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-action primary" id="btnKataBaru">🎲 Kata Baru (Host)</button>
+    </div>
+
+    <div class="status-bar" id="connectionStatus">⏳ Menunggu koneksi...</div>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js">
+</script>
+<script>
+  (function() {
+    // ==================== WORD GENERATOR 10JT+ ====================
+    const PRE = ["me","ber","ter","di","pe","ke","se","mem","men","meng","pem","pen","per","memper"];
+    const ROOTS = ["ajar","gambar","makan","minum","jalan","lari","tulis","baca","lihat","dengar","main","kerja","gali","tanam","panjat","lempar","buka","tutup","simpan","pukul","tendang","sapa","kirim","cuci","masak","rebus","goreng","bakar","saji","nikmat","enak","manis","asin","pahit","pedas","rumah","pintu","atap","lantai","kamar","tidur","mandi","sabun","baju","celana","sepatu","tas","dompet","uang","beli","jual","pasar","toko","meja","kursi","buku","pensil","kertas","komputer","lampu","kipas","televisi","gelas","piring","sendok"];
+    const SUF = ["kan","i","an","nya","lah","kah","ku","mu","wan","wati","isasi"];
+    const ADJ = ["besar","kecil","tinggi","rendah","panjang","pendek","cepat","lambat","baru","lama","kuat","lemah","bersih","kotor","manis","asin","pahit","pedas","gurih"];
+    function randomWord() {
+      let r = Math.floor(Math.random()*10);
+      if(r<3) return PRE[Math.floor(Math.random()*PRE.length)] + ROOTS[Math.floor(Math.random()*ROOTS.length)] + (Math.random()>0.5?SUF[Math.floor(Math.random()*SUF.length)]:"");
+      else if(r<6) return ROOTS[Math.floor(Math.random()*ROOTS.length)] + SUF[Math.floor(Math.random()*SUF.length)];
+      else if(r<8) return ADJ[Math.floor(Math.random()*ADJ.length)];
+      else return PRE[Math.floor(Math.random()*PRE.length)] + ROOTS[Math.floor(Math.random()*ROOTS.length)];
+    }
+
+    // ==================== GLOBAL STATE ====================
+    let peer = null;
+    let connections = {};
+    let myPeerId = null;
+    let myName = '';
+    let roomId = '';
+    let amIHost = false;
+    let players = {};
+    let currentWord = '';
+    let guessedLetters = new Set();
+    let gameActive = false;
+
+    // DOM
+    const menuScreen = document.getElementById('menuScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const namaInput = document.getElementById('namaInput');
+    const roomIdJoinInput = document.getElementById('roomIdJoinInput');
+    const btnBikinRoom = document.getElementById('btnBikinRoom');
+    const btnMasukRoom = document.getElementById('btnMasukRoom');
+    const roomIdDisplay = document.getElementById('roomIdDisplay');
+    const playerListEl = document.getElementById('playerList');
+    const wordDisplayEl = document.getElementById('wordDisplay');
+    const hintEl = document.getElementById('hintDisplay');
+    const categoryEl = document.getElementById('categoryDisplay');
+    const guessInput = document.getElementById('guessInput');
+    const submitGuess = document.getElementById('submitGuess');
+    const logContainer = document.getElementById('logContainer');
+    const copyRoomBtn = document.getElementById('copyRoomBtn');
+    const btnKeluar = document.getElementById('btnKeluar');
+    const btnKataBaru = document.getElementById('btnKataBaru');
+    const connectionStatus = document.getElementById('connectionStatus');
+
+    function addLog(msg, type = '') {
+      const d = document.createElement('div');
+      d.className = 'log-entry ' + type;
+      d.textContent = msg;
+      logContainer.appendChild(d);
+      logContainer.scrollTop = logContainer.scrollHeight;
+      if (logContainer.children.length > 20) logContainer.removeChild(logContainer.children[0]);
+    }
+
+    function updatePlayerList() {
+      playerListEl.innerHTML = '';
+      Object.entries(players).forEach(([pid, info]) => {
+        const tag = document.createElement('span');
+        tag.className = 'player-tag';
+        if (pid === myPeerId) tag.classList.add('you');
+        if (info.isHost) tag.classList.add('host');
+        tag.textContent = (pid === myPeerId ? '⭐ ' : '') + info.name + (info.isHost ? ' 👑' : '');
+        playerListEl.appendChild(tag);
+      });
+    }
+
+    function getWordDisplay() {
+      if (!currentWord) return '_ _ _ _ _';
+      return currentWord.split('').map(c => guessedLetters.has(c) ? c : '_').join(' ');
+    }
+
+    function refreshWordUI() {
+      wordDisplayEl.textContent = getWordDisplay();
+      hintEl.textContent = `🕵️ ${currentWord.length} huruf`;
+    }
+
+    function checkWin() {
+      if (!gameActive || !currentWord) return;
+      if (getWordDisplay().replace(/\s/g, '') === currentWord) {
+        gameActive = false;
+        wordDisplayEl.textContent = currentWord.toUpperCase();
+        addLog(`🎉 KATA TERJAWAB: ${currentWord.toUpperCase()}!`, 'correct');
+        broadcast({ type: 'word-solved', word: currentWord, by: myName });
+      }
+    }
+
+    function setNewWord(word = null) {
+      if (word) currentWord = word.toLowerCase();
+      else currentWord = randomWord().toLowerCase();
+      guessedLetters.clear();
+      gameActive = true;
+      categoryEl.textContent = '📌 KATA UMUM';
+      refreshWordUI();
+      addLog(`🔤 Kata baru: ${currentWord.length} huruf`, 'system');
+      if (amIHost) broadcast({ type: 'new-word', word: currentWord });
+    }
+
+    function broadcast(data) {
+      Object.values(connections).forEach(conn => {
+        if (conn.open) conn.send(data);
+      });
+    }
+
+    function sendTo(peerId, data) {
+      if (connections[peerId] && connections[peerId].open) {
+        connections[peerId].send(data);
+      }
+    }
+
+    function connectToPeer(remotePeerId) {
+      if (connections[remotePeerId]) return;
+      const conn = peer.connect(remotePeerId, { reliable: true });
+      setupConnection(conn, remotePeerId);
+    }
+
+    function setupConnection(conn, remoteId) {
+      conn.on('open', () => {
+        connections[remoteId] = conn;
+        addLog(`🔗 Terhubung: ${remoteId.substring(0,8)}...`, 'system');
+        connectionStatus.textContent = '🟢 Terhubung';
+        connectionStatus.classList.add('connected');
+        conn.send({ type: 'player-info', name: myName, isHost: amIHost, peerId: myPeerId });
+        if (amIHost && currentWord) {
+          conn.send({ type: 'new-word', word: currentWord });
+          conn.send({ type: 'guessed-letters', letters: Array.from(guessedLetters) });
+        }
+        conn.send({ type: 'request-players' });
+      });
+
+      conn.on('data', (data) => handleData(data, remoteId));
+
+      conn.on('close', () => {
+        addLog(`🔌 Terputus: ${players[remoteId]?.name || remoteId.substring(0,6)}`, 'system');
+        delete connections[remoteId];
+        delete players[remoteId];
+        updatePlayerList();
+        if (Object.keys(connections).length === 0) {
+          connectionStatus.textContent = '🟡 Menunggu pemain...';
+          connectionStatus.classList.remove('connected');
+        }
+      });
+
+      conn.on('error', (err) => console.error('Conn error:', err));
+    }
+
+    function handleData(data, fromPeerId) {
+      switch (data.type) {
+        case 'player-info':
+          players[fromPeerId] = { name: data.name, isHost: data.isHost };
+          updatePlayerList();
+          addLog(`👋 ${data.name} bergabung!`, 'system');
+          if (amIHost && currentWord) {
+            sendTo(fromPeerId, { type: 'new-word', word: currentWord });
+            sendTo(fromPeerId, { type: 'guessed-letters', letters: Array.from(guessedLetters) });
+          }
+          break;
+        case 'request-players':
+          Object.entries(players).forEach(([pid, info]) => {
+            sendTo(fromPeerId, { type: 'player-info', name: info.name, isHost: info.isHost, peerId: pid });
+          });
+          sendTo(fromPeerId, { type: 'player-info', name: myName, isHost: amIHost, peerId: myPeerId });
+          break;
+        case 'new-word':
+          currentWord = data.word.toLowerCase();
+          guessedLetters.clear();
+          gameActive = true;
+          refreshWordUI();
+          addLog(`🔤 Host ganti kata: ${currentWord.length} huruf`, 'system');
+          break;
+        case 'guess-letter':
+          const letter = data.letter.toLowerCase();
+          if (!guessedLetters.has(letter)) {
+            guessedLetters.add(letter);
+            refreshWordUI();
+            const ada = currentWord.includes(letter);
+            addLog(`🔤 ${data.by}: "${letter.toUpperCase()}" ${ada ? '✅ ADA' : '❌ TIDAK'}`, ada ? '' : 'wrong');
+            checkWin();
+          }
+          break;
+        case 'guess-word':
+          const wordGuess = data.word.toLowerCase();
+          if (wordGuess === currentWord) {
+            currentWord.split('').forEach(c => guessedLetters.add(c));
+            refreshWordUI();
+            gameActive = false;
+            wordDisplayEl.textContent = currentWord.toUpperCase();
+            addLog(`🎯 ${data.by} MENJAWAB: ${currentWord.toUpperCase()}!`, 'correct');
+          } else {
+            addLog(`❌ ${data.by}: "${wordGuess}" SALAH`, 'wrong');
+          }
+          break;
+        case 'word-solved':
+          gameActive = false;
+          currentWord.split('').forEach(c => guessedLetters.add(c));
+          wordDisplayEl.textContent = currentWord.toUpperCase();
+          addLog(`🏆 ${data.by} memecahkan kata!`, 'correct');
+          break;
+        case 'guessed-letters':
+          if (data.letters) {
+            data.letters.forEach(l => guessedLetters.add(l));
+            refreshWordUI();
+          }
+          break;
+      }
+    }
+
+    function initPeer(name) {
+      myName = name;
+      peer = new Peer();
+      peer.on('open', (id) => {
+        myPeerId = id;
+      });
+      peer.on('connection', (conn) => setupConnection(conn, conn.peer));
+      peer.on('error', (err) => {
+        addLog('⚠️ ' + err.message, 'system');
+        connectionStatus.textContent = '🔴 Error: ' + err.message;
+      });
+      peer.on('disconnected', () => {
+        connectionStatus.textContent = '🔴 Terputus, reconnect...';
+        peer.reconnect();
+      });
+    }
+
+    function createRoom(name) {
+      if (!name.trim()) { alert('Isi nama dulu!'); return; }
+      initPeer(name);
+      amIHost = true;
+      const checkPeer = setInterval(() => {
+        if (myPeerId) {
+          clearInterval(checkPeer);
+          roomId = myPeerId.substring(0, 6).toUpperCase();
+          players[myPeerId] = { name: name, isHost: true };
+          menuScreen.classList.add('hidden');
+          gameScreen.classList.add('active');
+          roomIdDisplay.textContent = myPeerId.substring(0, 10) + '...';
+          updatePlayerList();
+          setNewWord();
+          addLog(`🏠 Room dibuat!`, 'system');
+          addLog(`📋 ID: ${myPeerId}`, 'system');
+          connectionStatus.textContent = '🟡 Menunggu pemain join...';
+        }
+      }, 200);
+    }
+
+    function joinRoom(name, hostPeerId) {
+      if (!name.trim()) { alert('Isi nama dulu!'); return; }
+      if (!hostPeerId.trim()) { alert('Masukkan ID Room host!'); return; }
+      initPeer(name);
+      amIHost = false;
+      const checkPeer = setInterval(() => {
+        if (myPeerId) {
+          clearInterval(checkPeer);
+          roomId = hostPeerId.substring(0, 6).toUpperCase();
+          players[myPeerId] = { name: name, isHost: false };
+          menuScreen.classList.add('hidden');
+          gameScreen.classList.add('active');
+          roomIdDisplay.textContent = hostPeerId.substring(0, 10) + '...';
+          updatePlayerList();
+          addLog(`🔗 Menghubungi host...`, 'system');
+          connectionStatus.textContent = '🟡 Menghubungi host...';
+          connectToPeer(hostPeerId);
+        }
+      }, 200);
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    btnBikinRoom.addEventListener('click', () => createRoom(namaInput.value));
+    btnMasukRoom.addEventListener('click', () => joinRoom(namaInput.value, roomIdJoinInput.value.trim()));
+
+    submitGuess.addEventListener('click', () => {
+      const g = guessInput.value.trim().toLowerCase();
+      if (!g || !gameActive) return;
+      if (g.length > 1) {
+        broadcast({ type: 'guess-word', word: g, by: myName });
+        if (g === currentWord) {
+          currentWord.split('').forEach(c => guessedLetters.add(c));
+          refreshWordUI();
+          gameActive = false;
+          wordDisplayEl.textContent = currentWord.toUpperCase();
+          addLog(`🎯 KAMU MENJAWAB!`, 'correct');
+        } else {
+          addLog(`❌ "${g}" SALAH`, 'wrong');
+        }
+      } else if (/^[a-z]$/.test(g)) {
+        if (!guessedLetters.has(g)) {
+          guessedLetters.add(g);
+          refreshWordUI();
+          broadcast({ type: 'guess-letter', letter: g, by: myName });
+          addLog(`🔤 "${g.toUpperCase()}" ${currentWord.includes(g) ? '✅ ADA' : '❌ TIDAK'}`, currentWord.includes(g) ? '' : 'wrong');
+          checkWin();
+        }
+      }
+      guessInput.value = '';
+    });
+
+    guessInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') submitGuess.click();
+    });
+
+    btnKataBaru.addEventListener('click', () => {
+      if (!amIHost) { addLog('⚠️ Hanya host yang bisa ganti kata', 'system'); return; }
+      if (!gameActive || confirm('Ganti kata baru?')) {
+        setNewWord();
+        addLog('🔄 Host mengganti kata', 'system');
+      }
+    });
+
+    copyRoomBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(myPeerId).then(() => {
+        addLog('📋 ID Room disalin! Kirim ke temen.', 'system');
+      }).catch(() => prompt('Copy:', myPeerId));
+    });
+
+    btnKeluar.addEventListener('click', () => {
+      Object.values(connections).forEach(c => c.close());
+      if (peer) peer.destroy();
+      peer = null; connections = {}; players = {}; myPeerId = null;
+      gameScreen.classList.remove('active');
+      menuScreen.classList.remove('hidden');
+      logContainer.innerHTML = '<div class="log-entry system">👋 Keluar dari room.</div>';
+      connectionStatus.textContent = '⏳ Menunggu koneksi...';
+      connectionStatus.classList.remove('connected');
+    });
+
+    // Enter di form menu
+    namaInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') btnBikinRoom.click();
+    });
+    roomIdJoinInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') btnMasukRoom.click();
+    });
+
+  })();
+</script>
+</body>
+</html>
