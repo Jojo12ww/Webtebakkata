@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Tebak Kata Multiplayer • Real Player</title>
+  <title>Tebak Kata Multiplayer</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -39,7 +39,6 @@
       transition: all 0.3s ease;
     }
 
-    /* ========== MENU SCREEN ========== */
     .menu-screen {
       display: flex;
       flex-direction: column;
@@ -125,6 +124,7 @@
       font-family: inherit;
       letter-spacing: 0.3px;
       text-align: center;
+      width: 100%;
     }
     .btn-primary {
       background: linear-gradient(135deg, #7c3aed, #8b5cf6);
@@ -132,8 +132,12 @@
       box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
     }
     .btn-primary:hover {
-      transform: translateY(-1px);
+      transform: translateY(-2px);
       box-shadow: 0 12px 28px rgba(124, 58, 237, 0.4);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
     }
     .btn-outline {
       background: white;
@@ -153,6 +157,7 @@
       border: none;
       transition: all 0.2s;
       font-family: inherit;
+      width: auto;
     }
 
     .divider {
@@ -171,7 +176,6 @@
       background: #e9d5ff;
     }
 
-    /* ========== GAME SCREEN ========== */
     .game-screen {
       display: none;
       flex-direction: column;
@@ -213,9 +217,17 @@
       font-weight: 600;
       color: #7c3aed;
       transition: 0.2s;
+      font-family: inherit;
     }
     .btn-icon:hover {
       background: #faf5ff;
+    }
+    .btn-icon.danger {
+      color: #ef4444;
+      border-color: #fecaca;
+    }
+    .btn-icon.danger:hover {
+      background: #fef2f2;
     }
 
     .player-list {
@@ -332,6 +344,7 @@
       background: white;
       border-left: 3px solid #d8b4fe;
       color: #4c1d95;
+      font-size: 0.8rem;
     }
     .log-entry.system {
       background: #ede9fe;
@@ -375,6 +388,9 @@
       color: white;
       border: none;
     }
+    .btn-action.primary:hover {
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
 
     .status-bar {
       text-align: center;
@@ -384,10 +400,20 @@
       border-radius: 20px;
       background: #ede9fe;
       color: #6d28d9;
+      transition: all 0.3s;
     }
     .status-bar.connected {
       background: #ecfdf5;
       color: #065f46;
+    }
+    .status-bar.connecting {
+      background: #fef3c7;
+      color: #92400e;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
 
     .footer-note {
@@ -411,12 +437,12 @@
 <body>
 <div class="container" id="app">
 
-  <!-- ==================== MENU UTAMA ==================== -->
+  <!-- MENU UTAMA -->
   <div class="menu-screen" id="menuScreen">
     <div class="logo-section">
       <div class="logo-icon">🧩</div>
       <div class="title">Tebak Kata</div>
-      <div class="subtitle">Multiplayer • Real Player • Peer-to-Peer</div>
+      <div class="subtitle">Multiplayer • Ajak Temen Lo</div>
     </div>
 
     <div class="form-group">
@@ -426,23 +452,23 @@
 
     <button class="btn btn-primary" id="btnBikinRoom">🏠 Bikin Room Baru</button>
 
-    <div class="divider">atau gabung room</div>
+    <div class="divider">atau gabung room temen</div>
 
     <div class="form-group">
       <label class="form-label">🆔 ID Room</label>
-      <input class="form-input" id="roomIdJoinInput" placeholder="Paste ID Room dari host..." autocomplete="off" style="text-align:center; letter-spacing:1px; font-weight:600;">
+      <input class="form-input" id="roomIdJoinInput" placeholder="Tempel ID Room dari host..." autocomplete="off" style="text-align:center; letter-spacing:1px; font-weight:600;">
     </div>
     <button class="btn btn-outline" id="btnMasukRoom">➡️ Masuk Room</button>
 
-    <div class="footer-note">🇮🇩 10.000.000+ kata • Real-time WebRTC</div>
+    <div class="footer-note">🇮🇩 10.000.000+ kata • Peer-to-Peer • Real-time</div>
   </div>
 
-  <!-- ==================== GAME SCREEN ==================== -->
+  <!-- GAME SCREEN -->
   <div class="game-screen" id="gameScreen">
     <div class="top-bar">
       <span class="room-badge">🏠 <span id="roomIdDisplay">------</span></span>
-      <button class="btn-icon" id="copyRoomBtn">📋 Salin ID</button>
-      <button class="btn-icon" id="btnKeluar" style="color:#ef4444; border-color:#fecaca;">🚪 Keluar</button>
+      <button class="btn-icon" id="copyRoomBtn">📋 Salin</button>
+      <button class="btn-icon danger" id="btnKeluar">🚪 Keluar</button>
     </div>
 
     <div class="player-list" id="playerList">
@@ -461,20 +487,21 @@
     </div>
 
     <div class="log-box" id="logContainer">
-      <div class="log-entry system">🔌 Menghubungkan ke jaringan...</div>
+      <div class="log-entry system">👋 Selamat datang! Siap bermain.</div>
     </div>
 
     <div class="action-row">
       <button class="btn-action primary" id="btnKataBaru">🎲 Kata Baru (Host)</button>
     </div>
 
-    <div class="status-bar" id="connectionStatus">⏳ Menunggu koneksi...</div>
+    <div class="status-bar" id="connectionStatus">⏳ Siap terhubung...</div>
   </div>
 
 </div>
 
-<script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js">
-</script>
+<!-- PeerJS dari CDN -->
+<script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+
 <script>
   (function() {
     // ==================== WORD GENERATOR 10JT+ ====================
@@ -482,6 +509,7 @@
     const ROOTS = ["ajar","gambar","makan","minum","jalan","lari","tulis","baca","lihat","dengar","main","kerja","gali","tanam","panjat","lempar","buka","tutup","simpan","pukul","tendang","sapa","kirim","cuci","masak","rebus","goreng","bakar","saji","nikmat","enak","manis","asin","pahit","pedas","rumah","pintu","atap","lantai","kamar","tidur","mandi","sabun","baju","celana","sepatu","tas","dompet","uang","beli","jual","pasar","toko","meja","kursi","buku","pensil","kertas","komputer","lampu","kipas","televisi","gelas","piring","sendok"];
     const SUF = ["kan","i","an","nya","lah","kah","ku","mu","wan","wati","isasi"];
     const ADJ = ["besar","kecil","tinggi","rendah","panjang","pendek","cepat","lambat","baru","lama","kuat","lemah","bersih","kotor","manis","asin","pahit","pedas","gurih"];
+    
     function randomWord() {
       let r = Math.floor(Math.random()*10);
       if(r<3) return PRE[Math.floor(Math.random()*PRE.length)] + ROOTS[Math.floor(Math.random()*ROOTS.length)] + (Math.random()>0.5?SUF[Math.floor(Math.random()*SUF.length)]:"");
@@ -525,10 +553,10 @@
     function addLog(msg, type = '') {
       const d = document.createElement('div');
       d.className = 'log-entry ' + type;
-      d.textContent = msg;
+      d.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
       logContainer.appendChild(d);
       logContainer.scrollTop = logContainer.scrollHeight;
-      if (logContainer.children.length > 20) logContainer.removeChild(logContainer.children[0]);
+      if (logContainer.children.length > 30) logContainer.removeChild(logContainer.children[0]);
     }
 
     function updatePlayerList() {
@@ -576,50 +604,70 @@
 
     function broadcast(data) {
       Object.values(connections).forEach(conn => {
-        if (conn.open) conn.send(data);
+        if (conn.open) {
+          try { conn.send(data); } catch(e) {}
+        }
       });
     }
 
     function sendTo(peerId, data) {
       if (connections[peerId] && connections[peerId].open) {
-        connections[peerId].send(data);
+        try { connections[peerId].send(data); } catch(e) {}
       }
     }
 
     function connectToPeer(remotePeerId) {
       if (connections[remotePeerId]) return;
-      const conn = peer.connect(remotePeerId, { reliable: true });
+      addLog(`🔗 Menghubungi peer: ${remotePeerId.substring(0,8)}...`, 'system');
+      const conn = peer.connect(remotePeerId, { 
+        reliable: true,
+        serialization: 'json'
+      });
       setupConnection(conn, remotePeerId);
     }
 
     function setupConnection(conn, remoteId) {
       conn.on('open', () => {
         connections[remoteId] = conn;
-        addLog(`🔗 Terhubung: ${remoteId.substring(0,8)}...`, 'system');
-        connectionStatus.textContent = '🟢 Terhubung';
-        connectionStatus.classList.add('connected');
-        conn.send({ type: 'player-info', name: myName, isHost: amIHost, peerId: myPeerId });
+        addLog(`✅ Terhubung dengan peer!`, 'system');
+        updateConnectionStatus(true);
+        
+        // Kirim info diri
+        conn.send({ 
+          type: 'player-info', 
+          name: myName, 
+          isHost: amIHost, 
+          peerId: myPeerId 
+        });
+        
+        // Kalau host, kirim state game
         if (amIHost && currentWord) {
-          conn.send({ type: 'new-word', word: currentWord });
-          conn.send({ type: 'guessed-letters', letters: Array.from(guessedLetters) });
+          setTimeout(() => {
+            conn.send({ type: 'new-word', word: currentWord });
+            conn.send({ type: 'guessed-letters', letters: Array.from(guessedLetters) });
+          }, 500);
         }
+        
         conn.send({ type: 'request-players' });
       });
 
-      conn.on('data', (data) => handleData(data, remoteId));
+      conn.on('data', (data) => {
+        handleData(data, remoteId);
+      });
 
       conn.on('close', () => {
-        addLog(`🔌 Terputus: ${players[remoteId]?.name || remoteId.substring(0,6)}`, 'system');
+        const playerName = players[remoteId]?.name || remoteId.substring(0,6);
+        addLog(`🔌 ${playerName} terputus`, 'system');
         delete connections[remoteId];
         delete players[remoteId];
         updatePlayerList();
-        if (Object.keys(connections).length === 0) {
-          connectionStatus.textContent = '🟡 Menunggu pemain...';
-          connectionStatus.classList.remove('connected');
-        }
+        updateConnectionStatus(Object.keys(connections).length > 0);
       });
 
-      conn.on('error', (err) => console.error('Conn error:', err));
+      conn.on('error', (err) => {
+        console.error('Connection error:', err);
+        addLog(`⚠️ Error koneksi: ${err.message}`, 'system');
+      });
     }
 
     function handleData(data, fromPeerId) {
@@ -627,25 +675,41 @@
         case 'player-info':
           players[fromPeerId] = { name: data.name, isHost: data.isHost };
           updatePlayerList();
-          addLog(`👋 ${data.name} bergabung!`, 'system');
+          addLog(`👋 ${data.name} bergabung ke room!`, 'system');
+          
           if (amIHost && currentWord) {
-            sendTo(fromPeerId, { type: 'new-word', word: currentWord });
-            sendTo(fromPeerId, { type: 'guessed-letters', letters: Array.from(guessedLetters) });
+            setTimeout(() => {
+              sendTo(fromPeerId, { type: 'new-word', word: currentWord });
+              sendTo(fromPeerId, { type: 'guessed-letters', letters: Array.from(guessedLetters) });
+            }, 300);
           }
           break;
+
         case 'request-players':
           Object.entries(players).forEach(([pid, info]) => {
-            sendTo(fromPeerId, { type: 'player-info', name: info.name, isHost: info.isHost, peerId: pid });
+            sendTo(fromPeerId, { 
+              type: 'player-info', 
+              name: info.name, 
+              isHost: info.isHost, 
+              peerId: pid 
+            });
           });
-          sendTo(fromPeerId, { type: 'player-info', name: myName, isHost: amIHost, peerId: myPeerId });
+          sendTo(fromPeerId, { 
+            type: 'player-info', 
+            name: myName, 
+            isHost: amIHost, 
+            peerId: myPeerId 
+          });
           break;
+
         case 'new-word':
           currentWord = data.word.toLowerCase();
           guessedLetters.clear();
           gameActive = true;
           refreshWordUI();
-          addLog(`🔤 Host ganti kata: ${currentWord.length} huruf`, 'system');
+          addLog(`🔤 Host ganti kata baru (${currentWord.length} huruf)`, 'system');
           break;
+
         case 'guess-letter':
           const letter = data.letter.toLowerCase();
           if (!guessedLetters.has(letter)) {
@@ -656,6 +720,7 @@
             checkWin();
           }
           break;
+
         case 'guess-word':
           const wordGuess = data.word.toLowerCase();
           if (wordGuess === currentWord) {
@@ -668,12 +733,14 @@
             addLog(`❌ ${data.by}: "${wordGuess}" SALAH`, 'wrong');
           }
           break;
+
         case 'word-solved':
           gameActive = false;
           currentWord.split('').forEach(c => guessedLetters.add(c));
           wordDisplayEl.textContent = currentWord.toUpperCase();
           addLog(`🏆 ${data.by} memecahkan kata!`, 'correct');
           break;
+
         case 'guessed-letters':
           if (data.letters) {
             data.letters.forEach(l => guessedLetters.add(l));
@@ -683,72 +750,166 @@
       }
     }
 
+    function updateConnectionStatus(connected) {
+      if (connected) {
+        connectionStatus.textContent = '🟢 Terhubung dengan pemain lain';
+        connectionStatus.className = 'status-bar connected';
+      } else {
+        connectionStatus.textContent = amIHost ? '🟡 Menunggu pemain join...' : '🟡 Menunggu koneksi...';
+        connectionStatus.className = 'status-bar';
+      }
+    }
+
     function initPeer(name) {
       myName = name;
-      peer = new Peer();
+      
+      peer = new Peer(undefined, {
+        debug: 0
+      });
+
       peer.on('open', (id) => {
         myPeerId = id;
+        addLog(`🟢 Terhubung ke server`, 'system');
       });
-      peer.on('connection', (conn) => setupConnection(conn, conn.peer));
+
+      peer.on('connection', (conn) => {
+        addLog(`📞 Ada panggilan masuk...`, 'system');
+        setupConnection(conn, conn.peer);
+      });
+
       peer.on('error', (err) => {
-        addLog('⚠️ ' + err.message, 'system');
-        connectionStatus.textContent = '🔴 Error: ' + err.message;
+        console.error('Peer error:', err);
+        addLog(`⚠️ Error: ${err.message}`, 'system');
+        connectionStatus.textContent = '🔴 Error koneksi. Coba lagi.';
+        connectionStatus.className = 'status-bar';
       });
+
       peer.on('disconnected', () => {
-        connectionStatus.textContent = '🔴 Terputus, reconnect...';
+        addLog(`🔌 Terputus dari server, mencoba reconnect...`, 'system');
+        connectionStatus.textContent = '🟠 Reconnecting...';
+        connectionStatus.className = 'status-bar connecting';
         peer.reconnect();
       });
     }
 
     function createRoom(name) {
-      if (!name.trim()) { alert('Isi nama dulu!'); return; }
+      if (!name.trim()) { 
+        alert('Isi nama dulu ya!'); 
+        return; 
+      }
+      
       initPeer(name);
       amIHost = true;
+      
       const checkPeer = setInterval(() => {
         if (myPeerId) {
           clearInterval(checkPeer);
-          roomId = myPeerId.substring(0, 6).toUpperCase();
+          roomId = myPeerId;
           players[myPeerId] = { name: name, isHost: true };
+          
           menuScreen.classList.add('hidden');
           gameScreen.classList.add('active');
+          
           roomIdDisplay.textContent = myPeerId.substring(0, 10) + '...';
           updatePlayerList();
           setNewWord();
-          addLog(`🏠 Room dibuat!`, 'system');
-          addLog(`📋 ID: ${myPeerId}`, 'system');
-          connectionStatus.textContent = '🟡 Menunggu pemain join...';
+          
+          addLog(`🏠 Room berhasil dibuat!`, 'system');
+          addLog(`📋 ID Room: ${myPeerId}`, 'system');
+          addLog(`📤 Bagikan ID ini ke temen lo`, 'system');
+          
+          updateConnectionStatus(false);
         }
-      }, 200);
+      }, 100);
     }
 
     function joinRoom(name, hostPeerId) {
-      if (!name.trim()) { alert('Isi nama dulu!'); return; }
-      if (!hostPeerId.trim()) { alert('Masukkan ID Room host!'); return; }
+      if (!name.trim()) { 
+        alert('Isi nama dulu ya!'); 
+        return; 
+      }
+      if (!hostPeerId.trim()) { 
+        alert('Masukkan ID Room dari host!'); 
+        return; 
+      }
+      
       initPeer(name);
       amIHost = false;
+      
       const checkPeer = setInterval(() => {
         if (myPeerId) {
           clearInterval(checkPeer);
-          roomId = hostPeerId.substring(0, 6).toUpperCase();
+          roomId = hostPeerId;
           players[myPeerId] = { name: name, isHost: false };
+          
           menuScreen.classList.add('hidden');
           gameScreen.classList.add('active');
+          
           roomIdDisplay.textContent = hostPeerId.substring(0, 10) + '...';
           updatePlayerList();
+          
           addLog(`🔗 Menghubungi host...`, 'system');
           connectionStatus.textContent = '🟡 Menghubungi host...';
+          connectionStatus.className = 'status-bar connecting';
+          
           connectToPeer(hostPeerId);
         }
-      }, 200);
+      }, 100);
+    }
+
+    function leaveRoom() {
+      Object.values(connections).forEach(c => {
+        try { c.close(); } catch(e) {}
+      });
+      
+      if (peer) {
+        peer.destroy();
+      }
+      
+      peer = null;
+      connections = {};
+      players = {};
+      myPeerId = null;
+      currentWord = '';
+      guessedLetters.clear();
+      gameActive = false;
+      
+      gameScreen.classList.remove('active');
+      menuScreen.classList.remove('hidden');
+      
+      logContainer.innerHTML = '<div class="log-entry system">👋 Keluar dari room. Silakan buat/gabung room baru.</div>';
+      connectionStatus.textContent = '⏳ Siap terhubung...';
+      connectionStatus.className = 'status-bar';
+      
+      namaInput.value = '';
+      roomIdJoinInput.value = '';
     }
 
     // ==================== EVENT LISTENERS ====================
-    btnBikinRoom.addEventListener('click', () => createRoom(namaInput.value));
-    btnMasukRoom.addEventListener('click', () => joinRoom(namaInput.value, roomIdJoinInput.value.trim()));
+    btnBikinRoom.addEventListener('click', () => {
+      const name = namaInput.value.trim();
+      createRoom(name);
+    });
+
+    btnMasukRoom.addEventListener('click', () => {
+      const name = namaInput.value.trim();
+      const hostId = roomIdJoinInput.value.trim();
+      joinRoom(name, hostId);
+    });
+
+    // Enter di form
+    namaInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') btnBikinRoom.click();
+    });
+    
+    roomIdJoinInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') btnMasukRoom.click();
+    });
 
     submitGuess.addEventListener('click', () => {
       const g = guessInput.value.trim().toLowerCase();
       if (!g || !gameActive) return;
+      
       if (g.length > 1) {
         broadcast({ type: 'guess-word', word: g, by: myName });
         if (g === currentWord) {
@@ -756,20 +917,25 @@
           refreshWordUI();
           gameActive = false;
           wordDisplayEl.textContent = currentWord.toUpperCase();
-          addLog(`🎯 KAMU MENJAWAB!`, 'correct');
+          addLog(`🎯 KAMU MENJAWAB: ${currentWord.toUpperCase()}!`, 'correct');
         } else {
-          addLog(`❌ "${g}" SALAH`, 'wrong');
+          addLog(`❌ "${g}" BUKAN kata yang tepat`, 'wrong');
         }
       } else if (/^[a-z]$/.test(g)) {
         if (!guessedLetters.has(g)) {
           guessedLetters.add(g);
           refreshWordUI();
           broadcast({ type: 'guess-letter', letter: g, by: myName });
-          addLog(`🔤 "${g.toUpperCase()}" ${currentWord.includes(g) ? '✅ ADA' : '❌ TIDAK'}`, currentWord.includes(g) ? '' : 'wrong');
+          const ada = currentWord.includes(g);
+          addLog(`🔤 "${g.toUpperCase()}" ${ada ? '✅ ADA' : '❌ TIDAK'}`, ada ? '' : 'wrong');
           checkWin();
+        } else {
+          addLog(`🔁 Huruf "${g.toUpperCase()}" sudah ditebak`, 'system');
         }
       }
+      
       guessInput.value = '';
+      guessInput.focus();
     });
 
     guessInput.addEventListener('keypress', (e) => {
@@ -777,39 +943,8 @@
     });
 
     btnKataBaru.addEventListener('click', () => {
-      if (!amIHost) { addLog('⚠️ Hanya host yang bisa ganti kata', 'system'); return; }
-      if (!gameActive || confirm('Ganti kata baru?')) {
-        setNewWord();
-        addLog('🔄 Host mengganti kata', 'system');
+      if (!amIHost) { 
+        addLog('⚠️ Hanya host yang bisa ganti kata', 'system'); 
+        return; 
       }
-    });
-
-    copyRoomBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(myPeerId).then(() => {
-        addLog('📋 ID Room disalin! Kirim ke temen.', 'system');
-      }).catch(() => prompt('Copy:', myPeerId));
-    });
-
-    btnKeluar.addEventListener('click', () => {
-      Object.values(connections).forEach(c => c.close());
-      if (peer) peer.destroy();
-      peer = null; connections = {}; players = {}; myPeerId = null;
-      gameScreen.classList.remove('active');
-      menuScreen.classList.remove('hidden');
-      logContainer.innerHTML = '<div class="log-entry system">👋 Keluar dari room.</div>';
-      connectionStatus.textContent = '⏳ Menunggu koneksi...';
-      connectionStatus.classList.remove('connected');
-    });
-
-    // Enter di form menu
-    namaInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') btnBikinRoom.click();
-    });
-    roomIdJoinInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') btnMasukRoom.click();
-    });
-
-  })();
-</script>
-</body>
-</html>
+      if (!gameActive || confirm
